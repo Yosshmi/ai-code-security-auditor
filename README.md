@@ -14,9 +14,9 @@ security findings with grounded AI explanations and actionable reports.
 
 ## Current status
 
-The current release validates a local repository path and produces a
-deterministic inventory of files, extensions, sizes, ignored directories, and
-skipped symbolic links. Security scanning rules are under active development.
+The current release validates a local repository path, produces a deterministic
+file inventory, and detects possible hardcoded secrets using an evidence-first
+rule. Findings include file and line locations with redacted evidence.
 
 ## Current architecture
 
@@ -35,6 +35,12 @@ Path conversion and validation
                                 |
                                 v
                     files, sizes, and extensions
+                                |
+                                v
+                    hardcoded-secret detector
+                                |
+                                v
+                 redacted evidence with file + line
 ```
 
 ## Requirements
@@ -62,15 +68,18 @@ Repository accepted: C:\path\to\repository
 python -m unittest discover -s tests -v
 ```
 
-The tests cover path validation, nested file traversal, extension and size
-totals, ignored directories, dot directories, files without extensions,
-symbolic links where supported, and safe CLI errors.
+The tests cover path validation, repository traversal and filtering, extension
+and size totals, hardcoded-secret matches, placeholders, environment-variable
+access, redaction, binary files, oversized files, and safe CLI errors.
 
 ## Security boundary
 
 Repository input must be treated as untrusted. The inventory never executes
 repository code and does not follow symbolic links. Future releases must also
 apply file, size, time, resource, and network limits before public deployment.
+Possible secret values are redacted before they enter findings or terminal
+output. Findings require human review because pattern matching can produce
+false positives and false negatives.
 
 ## Production status
 
