@@ -1,7 +1,7 @@
 # AI Code Security Auditor
 
-An evidence-first repository security auditor built as a learning-focused,
-production-ready portfolio project.
+An evidence-first repository security auditor designed to combine deterministic
+security findings with grounded AI explanations and actionable reports.
 
 ## Portfolio links
 
@@ -9,11 +9,14 @@ production-ready portfolio project.
 - **Source Code:** https://github.com/Yosshmi/ai-code-security-auditor
 - **Demo Video:** Planned after the public workflow is complete.
 - **Technical Documentation:** This README and the future `docs/` directory.
-- **Architecture:** Current milestone architecture is documented below.
+- **Architecture:** The current architecture is documented below.
 - **Evaluation Results:** Not measured yet; results will be added after fixtures exist.
 
-The project is currently at **Milestone 1**. It validates a local repository
-directory but does not scan files yet.
+## Current status
+
+The current release provides the repository-input boundary: it validates and
+normalizes a local repository directory through the command line. Security
+scanning rules are under active development.
 
 ## Current architecture
 
@@ -34,7 +37,7 @@ Path conversion and validation
 ## Requirements
 
 - Python 3.12 or newer
-- No third-party runtime dependencies for Milestone 1
+- No third-party runtime dependencies
 
 ## Run the CLI
 
@@ -62,9 +65,10 @@ traceback.
 
 ## Security boundary
 
-Repository input must be treated as untrusted. This milestone only validates a
-local path. Future milestones must not execute repository code and must apply
-file, size, time, resource, and network limits before public deployment.
+Repository input must be treated as untrusted. The current release only
+validates a local path. Future releases must not execute repository code and
+must apply file, size, time, resource, and network limits before public
+deployment.
 
 ## Production status
 

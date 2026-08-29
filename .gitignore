@@ -4,7 +4,6 @@ __pycache__/
 .env
 .env.*
 !.env.example
-CODEX_RULES.md
 .coverage
 .pytest_cache/
 build/

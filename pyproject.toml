@@ -1,11 +1,10 @@
 [project]
 name = "ai-code-security-auditor"
 version = "0.1.0"
-description = "Evidence-first repository security auditing, built one understandable milestone at a time."
+description = "Evidence-first repository security auditing with deterministic findings and grounded AI explanations."
 readme = "README.md"
 requires-python = ">=3.12"
 license = { text = "MIT" }
 
 [tool.unittest]
 start-directory = "tests"
-
