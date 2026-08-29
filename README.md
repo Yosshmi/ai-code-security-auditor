@@ -15,8 +15,9 @@ security findings with grounded AI explanations and actionable reports.
 ## Current status
 
 The current release validates a local repository path, produces a deterministic
-file inventory, and detects possible hardcoded secrets using an evidence-first
-rule. Findings include file and line locations with redacted evidence.
+file inventory, detects possible hardcoded secrets, and identifies selected
+dynamic SQL execution patterns in Python. Findings include file and line
+locations with safe evidence.
 
 ## Current architecture
 
@@ -41,6 +42,9 @@ Path conversion and validation
                                 |
                                 v
                  redacted evidence with file + line
+                                |
+                                v
+                  Python SQL syntax-tree analysis
 ```
 
 ## Requirements
@@ -69,8 +73,8 @@ python -m unittest discover -s tests -v
 ```
 
 The tests cover path validation, repository traversal and filtering, extension
-and size totals, hardcoded-secret matches, placeholders, environment-variable
-access, redaction, binary files, oversized files, and safe CLI errors.
+and size totals, secret matching and redaction, safe file loading, dynamic SQL
+construction, parameterized queries, malformed Python, and safe CLI errors.
 
 ## Security boundary
 
@@ -80,6 +84,12 @@ apply file, size, time, resource, and network limits before public deployment.
 Possible secret values are redacted before they enter findings or terminal
 output. Findings require human review because pattern matching can produce
 false positives and false negatives.
+
+The SQL rule currently analyzes direct Python calls to `execute()` and
+`executemany()`. It detects f-strings, concatenation, percent formatting, and
+`str.format()`. It does not yet follow a dynamically constructed query through
+variables or analyze non-Python languages, so its findings and omissions require
+human review.
 
 ## Production status
 
