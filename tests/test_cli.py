@@ -37,10 +37,13 @@ class ValidateRepositoryPathTests(unittest.TestCase):
 class MainTests(unittest.TestCase):
     def test_valid_path_prints_confirmation_and_returns_success(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
+            database_path = Path(directory) / "auditor.db"
             output = io.StringIO()
 
             with redirect_stdout(output):
-                exit_code = main([directory])
+                exit_code = main([directory, "--database", str(database_path)])
+
+            database_was_created = database_path.exists()
 
         self.assertEqual(exit_code, 0)
         self.assertIn("Repository accepted:", output.getvalue())
@@ -51,6 +54,8 @@ class MainTests(unittest.TestCase):
         self.assertIn("Potential command injection patterns: 0", output.getvalue())
         self.assertIn("Potential path traversal patterns: 0", output.getvalue())
         self.assertIn("Potential XSS patterns: 0", output.getvalue())
+        self.assertIn("Stored scan: 1", output.getvalue())
+        self.assertTrue(database_was_created)
 
     def test_invalid_path_prints_helpful_error_without_traceback(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

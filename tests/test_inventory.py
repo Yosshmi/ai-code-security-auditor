@@ -32,6 +32,8 @@ class CollectRepositoryInventoryTests(unittest.TestCase):
             root = Path(directory)
             (root / ".git").mkdir()
             (root / ".git" / "config").write_bytes(b"ignored")
+            (root / ".security-auditor").mkdir()
+            (root / ".security-auditor" / "auditor.db").write_bytes(b"ignored")
             (root / ".github").mkdir()
             (root / ".github" / "workflow.yml").write_bytes(b"included")
 
@@ -39,7 +41,10 @@ class CollectRepositoryInventoryTests(unittest.TestCase):
 
         self.assertEqual(inventory.total_files, 1)
         self.assertEqual(inventory.files[0].relative_path, ".github/workflow.yml")
-        self.assertEqual(inventory.skipped_directories, (".git",))
+        self.assertEqual(
+            inventory.skipped_directories,
+            (".git", ".security-auditor"),
+        )
 
     def test_records_files_without_extensions(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
