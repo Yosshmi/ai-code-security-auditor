@@ -7,7 +7,7 @@ from pathlib import Path
 
 
 DEFAULT_IGNORED_DIRECTORIES = frozenset(
-    {".git", ".venv", "__pycache__", "node_modules"}
+    {".git", ".security-auditor", ".venv", "__pycache__", "node_modules"}
 )
 
 
@@ -97,4 +97,3 @@ def collect_repository_inventory(
         skipped_directories=tuple(skipped_directories),
         skipped_symbolic_links=tuple(skipped_symbolic_links),
     )
-

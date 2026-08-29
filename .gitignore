@@ -1,6 +1,7 @@
 __pycache__/
 *.py[cod]
 .venv/
+.security-auditor/
 .env
 .env.*
 !.env.example
