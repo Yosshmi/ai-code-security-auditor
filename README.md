@@ -16,8 +16,8 @@ security findings with grounded AI explanations and actionable reports.
 
 The current release validates a local repository path, produces a deterministic
 file inventory, detects possible hardcoded secrets, and identifies selected
-dynamic SQL execution patterns in Python. Findings include file and line
-locations with safe evidence.
+dynamic SQL, command injection, path traversal, and XSS patterns in Python.
+Findings include file and line locations with safe evidence.
 
 ## Current architecture
 
@@ -45,6 +45,9 @@ Path conversion and validation
                                 |
                                 v
                   Python SQL syntax-tree analysis
+                                |
+                                v
+             direct command, path, and XSS flow rules
 ```
 
 ## Requirements
@@ -74,7 +77,8 @@ python -m unittest discover -s tests -v
 
 The tests cover path validation, repository traversal and filtering, extension
 and size totals, secret matching and redaction, safe file loading, dynamic SQL
-construction, parameterized queries, malformed Python, and safe CLI errors.
+construction, parameterized queries, direct request-to-path and request-to-HTML
+flows, shell execution, malformed Python, and safe CLI errors.
 
 ## Security boundary
 
@@ -90,6 +94,11 @@ The SQL rule currently analyzes direct Python calls to `execute()` and
 `str.format()`. It does not yet follow a dynamically constructed query through
 variables or analyze non-Python languages, so its findings and omissions require
 human review.
+
+The command, path, and XSS rules currently identify selected direct Python
+source-to-sink patterns. They do not perform full data-flow analysis across
+assignments, functions, modules, or frameworks. Safe validation may therefore
+create a false positive, and indirect unsafe flows may produce a false negative.
 
 ## Production status
 
