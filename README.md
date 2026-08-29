@@ -6,7 +6,7 @@ production-ready portfolio project.
 ## Portfolio links
 
 - **Live Demo:** Planned - the project is not publicly deployed yet.
-- **Source Code:** Add the GitHub URL after the remote repository is created.
+- **Source Code:** https://github.com/Yosshmi/ai-code-security-auditor
 - **Demo Video:** Planned after the public workflow is complete.
 - **Technical Documentation:** This README and the future `docs/` directory.
 - **Architecture:** Current milestone architecture is documented below.
@@ -71,4 +71,3 @@ file, size, time, resource, and network limits before public deployment.
 This is not a finished or deployed application. The final project must provide
 a public end-to-end workflow that another person can use while the developer's
 laptop is off.
-
