@@ -15,6 +15,7 @@ from security_auditor.detectors.python_injection import (
 )
 from security_auditor.detectors.secrets import detect_secrets
 from security_auditor.detectors.sql_injection import detect_sql_injection
+from security_auditor.database import DatabaseError, record_completed_scan
 from security_auditor.findings import Finding
 from security_auditor.inventory import InventoryError, collect_repository_inventory
 
@@ -51,6 +52,12 @@ def build_parser() -> argparse.ArgumentParser:
         description="Validate a local repository path for a future security scan.",
     )
     parser.add_argument("repository", help="path to the local repository directory")
+    parser.add_argument(
+        "--database",
+        type=Path,
+        default=Path(".security-auditor") / "auditor.db",
+        help="SQLite database file used to store scan results",
+    )
     return parser
 
 
@@ -128,5 +135,26 @@ def main(argv: Sequence[str] | None = None) -> int:
     print_findings("Potential command injection patterns", command_findings)
     print_findings("Potential path traversal patterns", path_findings)
     print_findings("Potential XSS patterns", xss_findings)
+
+    all_findings = (
+        *secret_findings,
+        *sql_findings,
+        *command_findings,
+        *path_findings,
+        *xss_findings,
+    )
+    try:
+        scan_id = record_completed_scan(
+            database_path=args.database,
+            repository_path=repository_path,
+            inventory=inventory,
+            findings=all_findings,
+        )
+    except DatabaseError as error:
+        print(f"error: {error}", file=sys.stderr)
+        return 1
+
+    print(f"Stored scan: {scan_id}")
+    print(f"Database: {args.database.resolve()}")
 
     return 0
