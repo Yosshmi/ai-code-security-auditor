@@ -7,8 +7,15 @@ import sys
 from collections.abc import Sequence
 from pathlib import Path
 
+from security_auditor.detectors.python_injection import (
+    COMMAND_INJECTION_RULE_ID,
+    PATH_TRAVERSAL_RULE_ID,
+    XSS_RULE_ID,
+    detect_python_injection,
+)
 from security_auditor.detectors.secrets import detect_secrets
 from security_auditor.detectors.sql_injection import detect_sql_injection
+from security_auditor.findings import Finding
 from security_auditor.inventory import InventoryError, collect_repository_inventory
 
 
@@ -45,6 +52,18 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("repository", help="path to the local repository directory")
     return parser
+
+
+def print_findings(label: str, findings: Sequence[Finding]) -> None:
+    """Print one consistently formatted group of deterministic findings."""
+
+    print(f"{label}: {len(findings)}")
+    for finding in findings:
+        print(
+            f"  [{finding.rule_id}] "
+            f"{finding.relative_path}:{finding.line_number} - {finding.message}"
+        )
+        print(f"    Evidence: {finding.evidence}")
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -86,22 +105,28 @@ def main(argv: Sequence[str] | None = None) -> int:
         for link in inventory.skipped_symbolic_links:
             print(f"  {link}")
 
-    findings = detect_secrets(repository_path, inventory)
-    print(f"Potential secrets: {len(findings)}")
-    for finding in findings:
-        print(
-            f"  [{finding.rule_id}] "
-            f"{finding.relative_path}:{finding.line_number} - {finding.message}"
-        )
-        print(f"    Evidence: {finding.evidence}")
+    secret_findings = detect_secrets(repository_path, inventory)
+    print_findings("Potential secrets", secret_findings)
 
     sql_findings = detect_sql_injection(repository_path, inventory)
-    print(f"Potential SQL injection patterns: {len(sql_findings)}")
-    for finding in sql_findings:
-        print(
-            f"  [{finding.rule_id}] "
-            f"{finding.relative_path}:{finding.line_number} - {finding.message}"
-        )
-        print(f"    Evidence: {finding.evidence}")
+    print_findings("Potential SQL injection patterns", sql_findings)
+
+    injection_findings = detect_python_injection(repository_path, inventory)
+    command_findings = tuple(
+        finding
+        for finding in injection_findings
+        if finding.rule_id == COMMAND_INJECTION_RULE_ID
+    )
+    path_findings = tuple(
+        finding
+        for finding in injection_findings
+        if finding.rule_id == PATH_TRAVERSAL_RULE_ID
+    )
+    xss_findings = tuple(
+        finding for finding in injection_findings if finding.rule_id == XSS_RULE_ID
+    )
+    print_findings("Potential command injection patterns", command_findings)
+    print_findings("Potential path traversal patterns", path_findings)
+    print_findings("Potential XSS patterns", xss_findings)
 
     return 0
