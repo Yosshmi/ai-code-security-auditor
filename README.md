@@ -14,9 +14,9 @@ security findings with grounded AI explanations and actionable reports.
 
 ## Current status
 
-The current release provides the repository-input boundary: it validates and
-normalizes a local repository directory through the command line. Security
-scanning rules are under active development.
+The current release validates a local repository path and produces a
+deterministic inventory of files, extensions, sizes, ignored directories, and
+skipped symbolic links. Security scanning rules are under active development.
 
 ## Current architecture
 
@@ -31,7 +31,10 @@ Path conversion and validation
       |
       +---- invalid ----> helpful error + nonzero exit code
       |
-      +---- valid ------> normalized repository path
+      +---- valid ------> recursive repository inventory
+                                |
+                                v
+                    files, sizes, and extensions
 ```
 
 ## Requirements
@@ -59,16 +62,15 @@ Repository accepted: C:\path\to\repository
 python -m unittest discover -s tests -v
 ```
 
-The tests cover an existing directory, a missing path, a file passed instead
-of a directory, a successful CLI result, and a safe CLI error without a
-traceback.
+The tests cover path validation, nested file traversal, extension and size
+totals, ignored directories, dot directories, files without extensions,
+symbolic links where supported, and safe CLI errors.
 
 ## Security boundary
 
-Repository input must be treated as untrusted. The current release only
-validates a local path. Future releases must not execute repository code and
-must apply file, size, time, resource, and network limits before public
-deployment.
+Repository input must be treated as untrusted. The inventory never executes
+repository code and does not follow symbolic links. Future releases must also
+apply file, size, time, resource, and network limits before public deployment.
 
 ## Production status
 
