@@ -7,13 +7,14 @@ from pathlib import Path
 
 from security_auditor.findings import Finding
 from security_auditor.inventory import RepositoryInventory
+from security_auditor.rules import SECRET_RULE_ID
 from security_auditor.text_files import (
     MAX_SCANNABLE_FILE_SIZE_BYTES,
     read_repository_text_file,
 )
 
 
-RULE_ID = "SEC001"
+RULE_ID = SECRET_RULE_ID
 
 SECRET_ASSIGNMENT_PATTERN = re.compile(
     r"""

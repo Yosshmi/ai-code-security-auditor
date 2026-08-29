@@ -7,12 +7,13 @@ from pathlib import Path
 
 from security_auditor.findings import Finding
 from security_auditor.inventory import RepositoryInventory
+from security_auditor.rules import (
+    COMMAND_INJECTION_RULE_ID,
+    PATH_TRAVERSAL_RULE_ID,
+    XSS_RULE_ID,
+)
 from security_auditor.text_files import read_repository_text_file
 
-
-COMMAND_INJECTION_RULE_ID = "CMD001"
-PATH_TRAVERSAL_RULE_ID = "PATH001"
-XSS_RULE_ID = "XSS001"
 
 SHELL_FUNCTIONS = frozenset({"os.system", "os.popen"})
 SUBPROCESS_FUNCTIONS = frozenset(
@@ -197,4 +198,3 @@ def detect_python_injection(
         findings.extend(find_python_injection_patterns(text, file.relative_path))
 
     return tuple(findings)
-

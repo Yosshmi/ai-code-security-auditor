@@ -7,10 +7,11 @@ from pathlib import Path
 
 from security_auditor.findings import Finding
 from security_auditor.inventory import RepositoryInventory
+from security_auditor.rules import SQL_INJECTION_RULE_ID
 from security_auditor.text_files import read_repository_text_file
 
 
-RULE_ID = "SQL001"
+RULE_ID = SQL_INJECTION_RULE_ID
 SQL_EXECUTION_METHODS = frozenset({"execute", "executemany"})
 
 
@@ -106,4 +107,3 @@ def detect_sql_injection(
         findings.extend(find_sql_injection_in_python(text, file.relative_path))
 
     return tuple(findings)
-
