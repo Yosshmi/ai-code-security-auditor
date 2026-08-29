@@ -8,6 +8,7 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from security_auditor.detectors.secrets import detect_secrets
+from security_auditor.detectors.sql_injection import detect_sql_injection
 from security_auditor.inventory import InventoryError, collect_repository_inventory
 
 
@@ -88,6 +89,15 @@ def main(argv: Sequence[str] | None = None) -> int:
     findings = detect_secrets(repository_path, inventory)
     print(f"Potential secrets: {len(findings)}")
     for finding in findings:
+        print(
+            f"  [{finding.rule_id}] "
+            f"{finding.relative_path}:{finding.line_number} - {finding.message}"
+        )
+        print(f"    Evidence: {finding.evidence}")
+
+    sql_findings = detect_sql_injection(repository_path, inventory)
+    print(f"Potential SQL injection patterns: {len(sql_findings)}")
+    for finding in sql_findings:
         print(
             f"  [{finding.rule_id}] "
             f"{finding.relative_path}:{finding.line_number} - {finding.message}"
