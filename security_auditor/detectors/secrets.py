@@ -7,10 +7,13 @@ from pathlib import Path
 
 from security_auditor.findings import Finding
 from security_auditor.inventory import RepositoryInventory
+from security_auditor.text_files import (
+    MAX_SCANNABLE_FILE_SIZE_BYTES,
+    read_repository_text_file,
+)
 
 
 RULE_ID = "SEC001"
-MAX_SCANNABLE_FILE_SIZE_BYTES = 1_000_000
 
 SECRET_ASSIGNMENT_PATTERN = re.compile(
     r"""
@@ -93,37 +96,12 @@ def scan_file_for_secrets(
 ) -> tuple[Finding, ...]:
     """Read one eligible text file and return possible secret findings."""
 
-    if size_bytes > MAX_SCANNABLE_FILE_SIZE_BYTES:
-        return ()
-
-    root = repository_root.resolve(strict=True)
-    file_path = root / relative_path
-
-    if file_path.is_symlink():
-        return ()
-
-    try:
-        resolved_file = file_path.resolve(strict=True)
-    except OSError:
-        return ()
-
-    if not resolved_file.is_relative_to(root) or not resolved_file.is_file():
-        return ()
-
-    try:
-        content = resolved_file.read_bytes()
-    except OSError:
-        return ()
-
-    if b"\x00" in content:
-        return ()
-
-    try:
-        text = content.decode("utf-8")
-    except UnicodeDecodeError:
+    text = read_repository_text_file(repository_root, relative_path, size_bytes)
+    if text is None:
         return ()
 
     return find_secrets_in_text(text, relative_path)
+
 
 
 def detect_secrets(
@@ -142,4 +120,3 @@ def detect_secrets(
             )
         )
     return tuple(findings)
-
