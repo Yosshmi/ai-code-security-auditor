@@ -46,6 +46,7 @@ class MainTests(unittest.TestCase):
         self.assertIn("Repository accepted:", output.getvalue())
         self.assertIn("Files: 0", output.getvalue())
         self.assertIn("Total size: 0 bytes", output.getvalue())
+        self.assertIn("Potential secrets: 0", output.getvalue())
 
     def test_invalid_path_prints_helpful_error_without_traceback(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
