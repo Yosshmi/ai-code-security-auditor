@@ -17,7 +17,8 @@ security findings with grounded AI explanations and actionable reports.
 The current release validates a local repository path, produces a deterministic
 file inventory, detects possible hardcoded secrets, and identifies selected
 dynamic SQL, command injection, path traversal, and XSS patterns in Python.
-Findings include file and line locations with safe evidence.
+Findings include file and line locations with safe evidence and are persisted in
+a versioned SQLite database.
 
 ## Current architecture
 
@@ -48,6 +49,9 @@ Path conversion and validation
                                 |
                                 v
              direct command, path, and XSS flow rules
+                                |
+                                v
+              SQLite repositories, scans, rules, findings
 ```
 
 ## Requirements
@@ -61,6 +65,12 @@ From this repository directory:
 
 ```powershell
 python -m security_auditor C:\path\to\repository
+```
+
+Choose a different local database file when needed:
+
+```powershell
+python -m security_auditor C:\path\to\repository --database .\audit-results.db
 ```
 
 Expected successful output:
@@ -79,6 +89,8 @@ The tests cover path validation, repository traversal and filtering, extension
 and size totals, secret matching and redaction, safe file loading, dynamic SQL
 construction, parameterized queries, direct request-to-path and request-to-HTML
 flows, shell execution, malformed Python, and safe CLI errors.
+Database tests verify schema versioning, rule records, relationships, repeated
+scans, and that complete secret candidates are never persisted.
 
 ## Security boundary
 
@@ -99,6 +111,16 @@ The command, path, and XSS rules currently identify selected direct Python
 source-to-sink patterns. They do not perform full data-flow analysis across
 assignments, functions, modules, or frameworks. Safe validation may therefore
 create a false positive, and indirect unsafe flows may produce a false negative.
+
+## Data storage
+
+SQLite stores repository paths, scan metadata, deterministic rule definitions,
+and findings. Development database files are ignored by Git. The schema uses
+primary keys, foreign keys, indexes, a transaction for each completed scan, and
+SQLite `user_version` as the migration baseline. Production database selection,
+retention, backup, and migration execution will be defined before deployment.
+By default, local scan history is stored in `.security-auditor/auditor.db`; the
+generated state directory is excluded from both Git and repository inventory.
 
 ## Production status
 
