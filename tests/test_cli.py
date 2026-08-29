@@ -48,6 +48,9 @@ class MainTests(unittest.TestCase):
         self.assertIn("Total size: 0 bytes", output.getvalue())
         self.assertIn("Potential secrets: 0", output.getvalue())
         self.assertIn("Potential SQL injection patterns: 0", output.getvalue())
+        self.assertIn("Potential command injection patterns: 0", output.getvalue())
+        self.assertIn("Potential path traversal patterns: 0", output.getvalue())
+        self.assertIn("Potential XSS patterns: 0", output.getvalue())
 
     def test_invalid_path_prints_helpful_error_without_traceback(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
